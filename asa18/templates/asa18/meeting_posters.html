@@ -1,0 +1,91 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+{% load asa18_extras %}
+
+{% block headextra %}
+{{ block.super }}
+
+<!-- JQuery UI -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{% static 'asa18/js/list.min.js' %}"></script>
+
+<script>
+    $( document ).ready( function () {
+        $('#accordion').accordion({
+            collapsible: true,
+            active: false,
+            heightStyle: "content",
+            header: 'g > h3',
+        });
+
+        // Use list.js filtering
+        var posterList = new List('searchable-area',
+            {
+                valueNames: ['poster_title', 'poster_id', 'poster_presenter', ],
+                listClass: 'searchable-list',
+            }
+        )
+    });
+</script>
+
+<style>
+    .ui-widget {
+        font-family: inherit;
+    }
+    .ui-tabs-active, .ui-state-active {
+        background-color: {{ meeting.distinct_color }} !important;
+    }
+    .ui-tabs-active a, .ui-state-active a {
+        color: white !important;
+    }
+    .ui-tabs li {
+        max-width: 100%;
+    }
+    .ui-tabs li a {
+        max-width: 100%;
+        overflow: hidden;
+        word-wrap: break-word;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<!-- MathJax -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+{% endblock %}
+
+{% block content_meeting %}
+
+<a name="page-top"></a>
+<h1>{{ meeting.name }} &ndash; Posters</h1>
+
+{% if posters.count > 0 %}
+<div id="searchable-area">
+
+<p>You may use this search box to filter the poster list by ID, title or author.</p>
+<input class="search" placeholder="Search" /><br /><br />
+
+<div id="accordion" class="searchable-list">
+    {% for p in posters %}<g>
+    <h3>{% if p.id_no %}<span style="font-family: 'Raleway',serif; font-weight: 400;" class="poster_id">{{ p.generate_id }}:</span> {% endif %}
+            <span class="poster_title">{{ p.title }}</span><br />
+        <span class="poster_presenter">{{ p.presenter|capitalize_family:1 }}</span><span style="font-family: 'Raleway',serif; font-weight: 400;">, {{ p.presenter.institution }}</span></h3>
+    <div>{{ p.abstract|safe }}</div>
+    </g>{% endfor %}
+</div>
+
+{% else %}
+    <p>There are currently no accepted posters for this meeting.</p>
+{% endif %}
+
+</div>
+
+{% endblock %}

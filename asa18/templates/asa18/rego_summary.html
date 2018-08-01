@@ -1,0 +1,42 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+{% load asa18_extras %}
+
+{% block content_meeting %}
+
+<h1>Registration summary</h1>
+
+{% for m in meetings %}<a href="#{{ m.slug }}">{{ m.abbrv }}</a>{% if not forloop.last %} | {% endif %}{% endfor %}
+
+{% for m in meetings %}
+<a name="{{ m.slug }}"></a><h2>{{ m.name }}</h2>
+<table>
+    <tr><th>Metric</th><th>Count</th></tr>
+    {% with rego_info|get_dict_item:m.slug as meeting_rego_info %}
+    {% for key, value in meeting_rego_info.items %}
+    <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+    {% endfor %}{% endwith %}
+</table>
+
+<h3>Events</h3>
+<p>Only events requiring explicit registration are shown.</p>
+<table>
+    <tr><th>Event</th><th>Guests</th></tr>
+    {% with event_info|get_dict_item:m.slug as meeting_event_info %}
+    {% for key, value in meeting_event_info.items %}
+    <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+    {% endfor %}{% endwith %}
+</table>
+
+<h3>Dietary Restrictions</h3>
+<table>
+    <tr><th>Event</th><th>Dietary Restrictions</th></tr>
+    {% with dr_info|get_dict_item:m.slug as meeting_dr_info %}
+    {% for key, value in meeting_dr_info.items %}
+    <tr><td>{{ key }}</td><td>{% for k, v in value.items %}{{ k }}: {{ v }}{% if not forloop.last %}<br />{% endif %}{% endfor %}</td></tr>
+    {% endfor %}{% endwith %}
+</table>
+
+{% endfor $%}
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+
+{% block content_meeting %}
+
+<h2 class='helpdesk'>{{ meeting.name }}</h2><h1>ADACS / OzSTAR / Pawsey Live HPC Helpdesk</h1>
+    <p class='helpdesk'><b>Location:</b> Conference Foyer (ATC Ground Level)<br/>
+        <b>When:</b> Wednesday/Thursday 10.30am-4.30pm</p>
+
+<div class="helpdesk">
+    <p>If you are attending the ASA meeting and would like an opportunity to speak
+in person to a high performance computing (HPC) expert about your data
+and/or computing needs then please visit our live helpdesk. Staff from the
+    following organisations will be in attendance:</p>
+    <ul>
+        <li>Astronomy Data and Computing Services (ADACS);</li>
+        <li>Swinburne OzSTAR supercomputer;</li>
+        <li>Pawsey Supercomputing Centre.</li>
+    </ul>
+</div>
+
+<div class="helpdesk">
+<p>If you would like to pre-book a time please send an email to
+<a href="mailto:eresearch@astro.swin.edu.au">eresearch@astro.swin.edu.au</a>
+(making sure to mention the topic you are interested in).
+Otherwise just drop by for a chat when you have a spare moment.</p>
+</div>
+
+
+    <p><img src="/media/ADACS_white_bg.png" style="width: 50%"></p>
+    <p><img src="/media/OzStar.jpg" style="width: 50%"></p>
+    <p><img src="/media/PawseyLogoEmailBanner.png" style="width: 50%"></p>
+
+    
+{% endblock %}
+

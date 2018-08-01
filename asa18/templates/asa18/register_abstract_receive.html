@@ -1,0 +1,37 @@
+{% extends 'asa18/meeting_master.html' %}
+
+{% block headextra %}
+{{ block.super }}
+
+<script>
+   $( document ).ready(function () {
+      $('.dialog-holder').hide();
+      $('.abortable-form input[type=submit][name=_abort]').on('click', function (e) {
+         e.preventDefault();
+         var $this = $(this);
+         $('.dialog-holder').dialog({
+            title: "Please confirm",
+            content: "Are you sure you want to cancel your registration? This will delete all your data from the registration system, and is irreversible.",
+            modal: true,
+            buttons: {
+               "Cancel registration": function () { $this.unbind('click'); $this.trigger('click'); },
+               "No, don't": function () { $( this ).dialog('close'); }
+            },
+         });
+      });
+   });
+</script>
+
+{% endblock %}
+
+
+{% block content_meeting %}
+
+    <h3 class="limit-margin-bottom">Success!</h3>
+    <p>We have successfully recieved your abstract. We also sent you a confirmation email.</p>
+    <p>If you do not receive this confirmation email,
+    please let us know at <a href="mailto:ASA2018@astro.swin.edu.au">ASA2018@astro.swin.edu.au</a> as we will soon email you the payments information.</p>
+    <p>Thank you.</p>
+    <p>The LOC.</p>
+
+{% endblock %}

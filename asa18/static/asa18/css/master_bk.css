@@ -1,0 +1,532 @@
+html {
+    height: 100%;
+    box-sizing: border-box;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12pt;
+}
+
+.clearboth {
+    clear: both;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    padding-bottom: 4rem;
+    min-height: 100%;
+}
+
+a, a:hover, a:visited {
+    color: inherit;
+    text-decoration: underline;
+}
+
+#button_p a {
+ text-decoration:none;
+ color:#000;
+ position: center;
+}
+
+#button_p a.button {
+ background-color:#fff;
+ border:1px solid #660000;
+ border-radius:5px;
+ color:#000;
+ text-decoration:none;
+ margin-right:10px;
+ padding:10px 10px 10px 10px;
+}
+
+#button_p a.button:active, #button_p a.button:hover {
+ background-color:#000;
+ border:1px solid #660000;
+ border-radius:5px;
+ text-decoration:none;
+ color:#fff;
+ margin-right:10px;
+ padding:10px 10px 10px 10px;
+}
+
+div#banner-top {
+    width: 100%;
+    height: 125px;
+    /*background-color: black;*/
+    background-color: transparent;
+    background-position: center center;
+    background-size: cover;
+    padding: 0 20px 0 20px;
+}
+
+#banner-top img {
+    height: 125px;
+    padding: 14px 0 14px 0;
+    border: 0;
+}
+
+#banner-top #banner-title {
+    position: absolute;
+    right: 20px;
+    top: 0;
+    height: 75px;
+    padding: 20px;
+    border: 0;
+    margin: 0;
+    line-height: 85px;
+    font-size: 60px;
+    text-align: right;
+    font-family: 'Arvo', serif;
+    /* font-family: 'Sansita', serif;
+    font-weight: black, 900;
+    font-style: italic; */
+    color: white;
+    text-shadow: 2px 2px #000000;
+}
+
+.parallax {
+    /* The image used */
+    /*background-image: url("img_parallax.jpg");*/
+
+    /* Set a specific height */
+    height: 500px;
+
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#banner-top #banner-title a, a:hover, a:visited {
+    color: white;
+    text-decoration: none;
+    padding: 0;
+    border: 0;
+    margin: 0;
+}
+
+div#master-wrapper {
+    width: 100%;
+    margin: 0;
+    padding: 0 20px 0 20px;
+    border: 0;
+}
+
+div#meeting-nav-side {
+    width: 250px;
+    position: absolute;
+    float: left;
+    margin-right: 30px;
+    margin-top: 0px;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+div#meeting-nav-side a, div#meeting-nav-side a:hover, div#meeting-nav-side a:visited,
+  div#meeting-nav-top a, div#meeting-nav-top a:hover, div#meeting-nav-top a:visited {
+    width: 100%;
+    height: 1.8rem;
+    font-size: 1rem;
+    display: block;
+    line-height: calc(1.8rem - 2px);
+    text-decoration: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid black;
+    background-color: darkgrey;
+    color: white;
+}
+
+div#meeting-nav-top a, div#meeting-nav-top a:hover, div#meeting-nav-top a:visited {
+    height: 2.2rem;
+    line-height: calc(2.2rem - 2px);
+}
+
+div#meeting-nav-side a::before {
+    content: '> ';
+}
+
+div#meeting-nav-side a.subitem, div#meeting-nav-top a.subitem {
+    background-color: dimgray;
+
+    padding-left: 15px;
+    font-size: 0.82rem;
+}
+
+div#meeting-nav-top {
+    width: 100%;
+    font-size: 1rem;
+    background-color: lightgreen;
+    display: none;
+}
+
+div#meeting-nav-top > a:first-child {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+div#meeting-nav-top > a:first-child::after {
+    content: ' >';
+}
+
+div.blurb-box {
+    float: right;
+    position: relative;
+    top: -3.5rem;
+    width: 300px;
+    background-color: black;
+    padding: 5px 20px 5px 20px;
+    color: white;
+    margin-left: 10px;
+}
+
+.blurb-box table {
+    text-align: left;
+    color: inherit;
+    border: 0;
+}
+
+.blurb-box table td {
+    border: inherit;
+}
+
+.blurb-box th {
+    max-width: 35%;
+    vertical-align: top;
+    border: 0;
+    background-color: inherit;
+    color: inherit;
+}
+
+.blurb-box a, .blurb-box a:visited {
+    color: white !important ;
+}
+
+.h-blurb-wrap {
+    max-width: calc(100% - 300px);
+}
+
+.blurb-box img {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    max-width: 75%;
+    max-height: 300px;
+    display: block;
+}
+
+.form-table {
+    table-layout: fixed;
+    width: 100%;
+    border: 0;
+}
+.form-table tr {
+    width: 100%;
+    border: 0;
+}
+.form-table td {
+    border: 0;
+}
+.form-table td.label {
+    max-width: 25%;
+    width: 25%;
+}
+
+.errorlist {
+    color: red;
+}
+
+.form-options {
+    width: 100%;
+    max-width: 500px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-top: 2px;
+    margin-botto: 2px;
+    border: 1px solid black;
+    background-color: lightgrey;
+}
+
+.subform-ul-div {
+    width: 25%;
+    min-width: 250px;
+    float: left;
+    font-size: 0.77rem;
+    border: 1px dashed grey;
+    padding: 5px;
+}
+
+.subform-ul-div ul {
+    list-style-type: none;
+    padding: 0;
+    columns: 2;
+    -webkit-columns: 2;
+    -moz-columns: 2;
+    border-collapse: collapse;
+}
+
+.warning, .success, .note {
+    width: 95%;
+    color: black;
+    text-align: center;
+    font-size: 0.87rem;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.warning {
+    border: 1px solid red;
+    background-color: pink;
+}
+
+.success {
+    border: 1px solid green;
+    background-color: lightgreen;
+}
+
+.note {
+    border: 1px solid gold;
+    background-color: lightyellow;
+}
+
+input[type=submit] {
+    background-color: black;
+    color: white;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+div#content {
+    padding-left: 300px;
+}
+
+#content a, #content a:hover, #content a:visited {
+    color: black;
+    text-decoration: underline;
+}
+
+div#footer {
+    background: black;
+    color: white;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font-size: 0.78rem;
+    padding: 1rem;
+}
+
+#footer a {
+    color: white;
+    text-decoration: underline;
+}
+
+div#tabs {
+     display: inline-block;
+     width: 100%;
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Arvo', serif;
+    /* font-family: 'Sansita', serif;
+    font-weight: black, 900;
+    font-style: italic; */
+}
+
+.stroke-black {
+    -webkit-text-stroke: 0.3px black;
+}
+
+.secondary {
+    
+    font-family: 'Arvo', serif;
+    font-style: italic;
+    font-size: 40px;
+    /*font-weight: bold;*/
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.half {
+    width: 49.75%;
+    padding-left: 1%;
+    padding-right: 1%;
+    min-width: 200px;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.body-pad {
+    padding: 20px;
+}
+
+.hint {
+    color: darkgrey;
+    font-size: 0.75rem;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+.center {
+    text-align: center;
+}
+
+.limit-margin-top {
+    margin-top: 5px;
+}
+
+.limit-margin-bottom {
+    margin-bottom: 5px;
+}
+
+.nobefore::before {
+    content: '' !important;
+}
+
+.sponsor-logo {
+    max-width: 250px;
+    max-height: 150px;
+    vertical-align: middle;
+    margin: 10px;
+}
+
+.sponsor-logo-table {
+    /*display: table;*/
+    width: 100%;
+    line-height: 100%;
+    text-align: center;
+    line-break: loose;
+}
+
+.sponsor-logo-table td {
+    vertical-align: middle;
+    display: table-cell;
+}
+
+.rulemain {
+	border: 0;
+	border-bottom: 1px dashed #ccc;
+	background: #999;
+	width: 90% ;
+	max-width: 400px ;
+}
+
+.zebra {
+    background: repeating-linear-gradient(
+      45deg,
+      #ffffff,
+      #ffffff 10px,
+      #f5f5f5 10px,
+      #f5f5f5 20px
+    );
+}
+
+.search {
+    font-size: 1.5em;
+    font-family: inherit;
+    width: 260px;
+    border-radius: 5px;
+    border: 1px solid grey;
+    padding: 5px;
+}
+
+.search:focus {
+    border-color: blue;
+}
+
+table, table td, table th {
+    border: 1px solid grey;
+    border-collapse: collapse;
+    padding: 3px;
+}
+
+th {
+    background: black;
+    color: white;
+}
+
+@media screen and (max-width: 769px) {
+    div#meeting-nav-side {
+        display: none;
+    }
+    div#meeting-nav-top {
+        display: block;
+    }
+    div#content {
+        padding-left: 0;
+    }
+    div.blurb-box {
+        top: auto;
+        float: none;
+        width: 100%;
+        margin-left: auto;
+    }
+    .h-blurb-wrap {
+        max-width: 100%;
+    }
+    table, iframe {
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    #banner-top #banner-title {
+        font-size: 28.5px;
+        max-width: 75px;
+        line-height: 28.5px;
+        padding-top: 9px;
+        padding-bottom: 9px;
+    }
+    #banner-splash {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    div#tabs li {
+        width: 100%;
+    }
+
+    .float-left {
+        float: none;
+    }
+    .half {
+        width: 100%;
+    }
+
+    .form-table td.label {
+        width: 40%;
+        max-width: 40%;
+    }
+
+    .sponsor-logo {
+        max-width: 200px;
+        max-height: 120px;
+        vertical-align: middle;
+        margin: 10px;
+    }
+
+    body {
+        padding-bottom: 5.5rem;
+    }
+}

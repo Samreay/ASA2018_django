@@ -1,0 +1,53 @@
+{% extends 'asa18/master_index.html' %}
+{% load staticfiles %}
+
+{% block headextra %}
+<link rel="stylesheet" type="text/css" href="{% static 'asa18/css/splash.css' %}" />
+
+<script>
+    $( document ).ready(function () {
+        $('#banner-splash').css('background-image', "url({{ banner.img.url }})");
+        {% if banner.vert_position %}
+        $('#banner-splash').css('background-position', 'center {{ banner.vert_position }}%');
+        {% endif %}
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="banner-splash" class="parallax">
+    <p>
+        ASA Annual Scientific Meeting &amp;<br />Harley Wood School for Astronomy 2018<br />
+        <span class="secondary">Swinburne University of Technology</span>
+    </p>
+</div>
+
+{% if messages %}<br />{% endif %}
+{% for message in messages %}
+<div class="{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+
+<div id="nav-splash">
+    We are currently proceeding with some maintenance. Please come back in a few minutes. Thank you for your understanding.
+</div>
+
+{% if latest_news %}
+<div id="splash-news">
+    <h3 class="hint limit-margin-bottom" style="font-size:1rem;">Latest news</h3>
+<h2 class="limit-margin-top">{{ latest_news.title }}<span class="hint"> | {{ latest_news.pub_date }}</span></h2>
+{{ latest_news.body|safe|truncatewords_html:100 }}
+    <a href="{{ latest_news.get_absolute_url }}">Read more &rarr;</a> | <a href="/news/">All news</a>
+</div>
+{% endif %}
+
+{% if sponsors.count > 0 %}
+<div id="splash-spon-sors">
+<h2>Sponsors</h2>
+<p>{{ GLOBAL_PAGE_TITLE }} is proudly sponsored by the following organizations and companies:</p>
+<div class="spon-sor-logo-table">
+{% for sponsor in sponsors %}<a href="{{ sponsor.url }}" target="_blank"><img src="{{ sponsor.logo.url }}" class="spon-sor-logo"/></a> {% endfor %}
+<p><h3>We acknowledge support from the Hunstead gift for Astrophysics at the Sydney Institute for Astronomy.</h3></p>
+</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% load staticfiles %}
+
+<html>
+<head>
+    <title>{% block title %}{{ GLOBAL_PAGE_TITLE }} {% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!--Google fonts-->
+    <!--<link href="https://fonts.googleapis.com/css?family=Bungee+Outline|Bungee+Shade|Cabin+Sketch:400,700|Londrina+Outline|Niconne|Open+Sans:400,400i,700" rel="stylesheet">-->
+    <!--<link href="https://fonts.googleapis.com/css?family=Alfa+Slab+One|Bungee+Inline|Raleway:400,400i,700,700i" rel="stylesheet">-->
+    <!--link href="https://fonts.googleapis.com/css?family=Bungee+Outline|Raleway:400,400i,700,700i|Sansita+One|Sansita:400|Tangerine" rel="stylesheet"-->
+    <!--link href="https://fonts.googleapis.com/css?family=Playfair+Display|Arvo|Cormorant+Garamond|Work+Sans" rel="stylesheet"-->
+
+    <link rel="stylesheet" type="text/css" href="{% static 'asa18/css/master.css' %}" />
+
+    <!--JQuery-->
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous">
+
+    </script>
+
+    <script src="{% static 'asa18/jqueryui/jquery-ui.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'asa18/jqueryui/jquery-ui.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'asa18/jqueryui/jquery-ui.structure.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'asa18/jqueryui/jquery-ui.theme.min.css' %}" />
+
+    {% block headextra %}
+        <script>
+            $( document ).ready(function () {
+                $('body').css('background-image', "url({{ banner.img.url }}) no-repeat");
+
+                {% if banner.vert_position %}
+                    $('body').css('background-position', 'center {{ banner.vert_position }}%');
+                {% endif %}
+            });
+        </script>
+    {% endblock %}
+</head>
+
+<body>
+
+<div id="banner-top">
+    <a href="http://asa.astronomy.org.au/" target="_blank"><img src="{% static 'asa18/img/The-ASA-Logo-Converted.png' %}" /></a>
+    <a href="http://astronomy.swinburne.edu.au" target="_blank"><img src="{% static 'asa18/img/astro_h.png' %}" /></a>
+    {% block bannertop %}{% endblock %}
+</div>
+
+{% block content %}
+<p>This is the test page!</p>
+<p>The time is now {{ now|time }}</p>
+
+<p>This is a para</p>
+<p>This is a para</p>
+<p>This is a para</p>
+<p>This is a para</p>
+<p>This is a para</p>
+
+{% endblock %}
+
+<div class="clearboth"></div>
+<div id="footer">Copyright &copy; <a href="http://astronomy.swinburne.edu.au">CAS</a>/<a href="http://www.swinburne.edu.au">Swinburne University of Technology</a> 2018. Website Scaffold copyright &copy; <a href="http://rsaa.anu.edu.au">RSAA</a>/<a href="http://www.anu.edu.au">ANU</a> 2017-2018. Powered by <a href="http://www.djangoproject.com" target="_blank">Django</a>.</div>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+numpy>=1.14.0
+django==1.9
+django-simple-captcha>=0.5.6
+django-tinymce>=2.7.0
+Django-tinymce-filebrowser>=0.2.1
+sorl-thumbnail>=12.4.1
+django-colorfield>=0.1.14
+django-multiselectfield>=0.1.8
+django-countries>=5.1.1
+pytz>=2017.3
+django-ckeditor==5.4.0
+stripe==1.79.1
+lxml==4.1.1
+reportlab==3.4.0
+
+#For dev only:
+django-extensions>=1.9.7
+#ipython==6.2.1
+gunicorn==19.6.0
+
+Unidecode==1.0.22

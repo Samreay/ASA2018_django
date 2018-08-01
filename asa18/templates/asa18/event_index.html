@@ -1,0 +1,36 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+
+{% block content_meeting %}
+
+<h1>{% if meeting %}{{ meeting.name }} &ndash; {% endif %}Events</h1>
+
+<p>Some events require registration. To register for an event, please use our
+    registration system.</p>
+
+{% if events.count == 0 %}
+<p><strong>There are no events listed for {{ meeting.abbrv }}.</strong></p>
+{% endif %}
+
+{% for event in events %}
+<div style="overflow: hidden;">
+    <h2 class="h-blurb-wrap">{{ event.name }}</h2>
+    <div class="blurb-box" style="background-color:{{ meeting.distinct_color }}; color: white;">
+    <table>
+        <tr><th>When:</th><td>
+            {{ event.time_start|date:'D j M Y, g:iA' }} - {% if event.time_end|date:'jMY' != event.time_start|date:'jMY' %}{{ event.time_end|date:'D j M Y, g:iA' }}{% else %}{{ event.time_end|date:'g:iA' }}{% endif %}
+        </td></tr>
+        {% if event.location %}
+        <tr><th>Where:</th><td>{{ event.location|safe }}</td></tr>
+        {% if event.eventoption_set.count > 0 %}<tr><th colspan="2" align="center">Registration required - closes {{ event.compute_rego_closes }}</th> </tr>
+        <tr><td colspan="2" align="center">You can register for this event as part of your <a href="{% url 'register_splash' %}">meeting registration</a>.</td><tr>{% endif %}
+        {% endif %}
+    </table>
+</div>
+    <p>{{ event.description|safe|striptags|truncatewords_html:50 }} <a href="{{ meeting.get_absolute_event_url }}{{ event.get_relative_url }}">Read more &rarr;</a></p>
+</div>
+<!--<div class="clearboth"></div>-->
+
+{% endfor %}
+
+{% endblock %}

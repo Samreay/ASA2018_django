@@ -1,0 +1,13 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+
+{% block content_meeting %}
+
+{% if meeting %}<h3>{{ meeting.name }}</h3>{% endif %}
+
+<h1>{{ news_item.title }}
+    <span class="hint"> | {{ news_item.pub_date }}</span></h1>
+
+{{ news_item.body|safe }}
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+
+{% block content_meeting %}
+
+<h1>{{ meeting.name }} &ndash; Sponsors</h1>
+<p>{{ meeting.name }} is proudly sponsored by the following organizations and companies:</p>
+
+<div class="spon-sor-logo-table">
+        {% for sponsor in sponsors %}<a href="{{ sponsor.url }}" target="_blank"><img src="{{ sponsor.logo.url }}" class="spon-sor-logo"/></a> {% endfor %}
+</div>
+
+<p>We acknowledge support from the Hunstead gift for Astrophysics at the Sydney Institute for Astronomy.</p>
+<p>We thank the School of Science at Swinburne University for their support.</p>
+<p>The Rainbow Dinner is sponsored by People & Culture at Swinburne University.</p>
+
+{% endblock %}

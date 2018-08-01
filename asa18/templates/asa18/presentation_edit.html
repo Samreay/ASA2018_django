@@ -1,0 +1,114 @@
+{% extends 'asa18/meeting_master.html' %}
+
+{% block headextra %}
+{{ block.super }}
+
+<script>
+   $( document ).ready(function () {
+      $('.dialog-holder').hide();
+      $('.abortable-form input[type=submit][name=_exit]').on('click', function (e) {
+         e.preventDefault();
+         var $this = $(this);
+         $('.dialog-holder').dialog({
+            title: "Please confirm",
+            open: function () {
+               $('#dialog-content').text("Are you sure you want to exit?");
+            },
+            modal: true,
+            buttons: {
+               "Leave system": function () {
+                  $this.unbind('click');
+                  $('#id_abstract').val('x');
+                  $('#id_title').val('x');
+                  $this.trigger('click'); },
+               "No, don't": function () { $( this ).dialog('close'); }
+            },
+         });
+      });
+      $('.abortable-form input[type=submit][name^=_delete]').on('click', function (e) {
+         e.preventDefault();
+         var $this = $(this);
+         $('.dialog-holder').dialog({
+            title: "Please confirm abstract deletion",
+            open: function () {
+               $('#dialog-content').text("Are you sure you want to delete this abstract? This process is irreversible.");
+            },
+            modal: true,
+            buttons: {
+               "Delete abstract": function () {
+                  $this.unbind('click');
+                  $('#id_abstract').val('x');
+                  $('#id_title').val('x');
+                  $this.trigger('click'); },
+               "No, don't": function () { $( this ).dialog('close'); }
+            },
+         });
+      });
+      $('.abortable-form input[type=submit][name^=_alter]').on('click', function (e) {
+         e.preventDefault();
+         var $this = $(this);
+         $this.unbind('click');
+         $('#id_abstract').val('x');
+         $('#id_title').val('x');
+         $this.trigger('click');
+      });
+   });
+</script>
+
+{% endblock %}
+
+{% block content_meeting %}
+
+<h3 class="limit-margin-bottom">Abstracts for {{ attendee.full_name }}</h3>
+<h1 class="limit-margin-top">Edit Abstracts</h1>
+
+<div class="warning">Do NOT use your Back, Forward or Refresh buttons.<br />
+Your log-in URL will expire in {{ remain_hrs }} h, {{ remain_min }} m.</div><br />
+
+{% if success_message %}<div class="success">{{ success_message }}</div>{% endif %}
+
+<p>From this page, you can add, edit and/or remove abstracts you have
+submitted. Note that your token for accessing this page expires at
+<strong>midnight AEDT</strong> - make sure you're done by then!</p>
+
+<p>If you encounter any issues modiyfing your abstract submission(s), please
+    contact <a href="mailto:{{ REGISTRATION_EMAIL }}">{{ REGISTRATION_EMAIL }}</a>.</p>
+
+<form method="post" action="{{ submit_target }}" class="abortable-form">
+   {% csrf_token %}
+   {% if editing %}<strong>Editing {{ form.title.value }}</strong><br />{% endif %}
+   {% for field in form %}{% if field.is_hidden %}{{ field }}{% endif %}{% endfor %}
+   <table class="form-table">
+      {% for field in form %}{% if not field.is_hidden %}
+      <tr><td class="label">{{ field.label }}</td><td>{{ field }}</td></tr>
+      {% if field.errors %}<tr><td class="hint errorlist" colspan="2">{{ field.errors.as_ul }}</td></tr>{% endif %}
+      {% if field.help_text %}<tr><td class="hint" colspan="2">{{ field.help_text }}</td></tr>{% endif %}
+      {% endif %}{% endfor %}
+   </table>
+
+   <br />
+   <input type="submit" name="_add_another" value="Save/update abstract >" /><br /><br />
+
+<h3>Submitted abstracts</h3>
+{% if abstracts_submitted.count > 0 %}
+   {% for abstract in abstracts_submitted %}
+   <p><strong>{{ abstract.title }}</strong> ({{ abstract.get_type_display }})
+   <input type="submit" name="_alter_{{ abstract.pk }}" value="Edit >" />&nbsp;
+      <input type="submit" name="_delete_{{ abstract.pk }}" value="Delete &times;" style="background-color: red;"/>
+   </p>
+   {{ abstract.abstract|safe }}
+   {% endfor %}
+{% else %}
+   You have not submitted an abstract.
+{% endif %}
+
+   <br /><br /><input type="submit" name="_exit"
+          value="Exit &crarr;" style="background-color: red;" />
+
+   </form>
+
+<div class="dialog-holder" title="Are you sure?" style="display: none;">
+   <p id="dialog-content"></p>
+</div>
+
+{% endblock %}

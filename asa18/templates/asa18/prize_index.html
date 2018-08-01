@@ -1,0 +1,22 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+{% load asa18_extras %}
+
+{% block content_meeting %}
+
+<h1>{% if meeting %}{{ meeting.name }} &ndash; {% endif %}Prizes</h1>
+
+{% if news_items.count == 0 %}
+<p>There are no prizes listed{% if meeting %} for {{ meeting.abbrv }}{% endif %}.</p>
+{% endif %}
+
+{% for prize in prizes %}
+<div>
+<h2>{{ prize.name }}</h2>
+{{ prize.about|safe|truncatewords_html:40 }}
+<a href="{{ prize.get_absolute_url }}">Read more &rarr;</a>
+</div>
+{% comment %}{% if forloop.counter|divisibleby:"2" %}<div class="clearboth"></div>{% endif %}{% endcomment %}
+{% endfor %}
+
+{% endblock %}

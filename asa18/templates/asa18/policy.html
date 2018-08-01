@@ -1,0 +1,48 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+
+{% block headextra %}
+{{ block.super }}
+
+<!-- JQuery UI -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    $( document ).ready(function () {
+        $( '#tabs' ).tabs();
+    });
+</script>
+<style>
+    .ui-widget {
+        font-family: inherit;
+    }
+    .ui-tabs-active, .ui-state-active {
+        background-color: {{ meeting.distinct_color }} !important;
+    }
+    .ui-tabs-active a, .ui-state-active a {
+        color: white !important;
+    }
+</style>
+{% endblock %}
+
+{% block content_meeting %}
+
+<h1>{{ meeting.name }} &ndash; Policies</h1>
+<p>By registering to attend {{ meeting.abbrv }}, you acknowledge to have read, and pledge to abide by, the following
+policies.</p>
+
+<div id="tabs">
+<ul>{% for policy in meeting.policy_set.all %}
+    <li><a href="#{{ policy.slug }}">{{ policy.name|truncatechars:20 }}</a></li>
+    {% endfor %}</ul>
+
+{% for policy in meeting.policy_set.all %}
+<div id="{{ policy.slug }}"><a name="{{ policy.slug }}"></a>
+<h2>{{ policy.name }}</h2>
+{{ policy.content|safe }}
+</div>
+    {% endfor %}</div>
+
+<div style="clearboth"></div>
+
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+
+{% block content_meeting %}
+
+<h1>Registration</h1>
+
+<div class="float-left half">
+{#<div>#}
+    <h2>New registration</h2>
+    {% if rego_open %}
+    <p>If you haven't registered yet, start here.</p>
+    <p class="warning">Once the registration process has started, you <strong>must</strong>
+    complete it in a single browser session. You must fill out your personal information, have your abstracts ready, and indicate which events you wish to attend. You can cancel your registration at any stage and start the process again.</p>
+    <p>If you encounter any issues during your registration process, please
+    contact <a href="mailto:{{ REGISTRATION_EMAIL }}">{{ REGISTRATION_EMAIL }}</a>.</p>
+    <br />
+    <p id="button_p"><a href="{% url 'register_person' %}" class="button"><strong>Start registration</strong></a></p>
+    <br />
+    {% else %}
+        <p>Registration is not currently open.</p>
+    {% endif %}
+        <h2>Registration status</h2>
+        {% for m in meetings %}
+            <p style="text-align:left;"><strong>{{ m.name }}:</strong>
+            {% if 'ASA' in m.name %}
+                <!--p style="color:red;">Deadline for abstract submission has been extended to <i>18 April, 2018</i>.</p-->
+            {% endif %}
+                {% if m.get_opened_rego_list  %}
+                    <ul>
+                        <li>Options currently opened:</li>
+                        <ul>
+                        {% for option in m.get_opened_rego_list %}
+                            <li><i>{{ option.name }}</i> is open until <i>{{ option.closes|date }}</i></li>
+                        {% endfor %}
+                        </ul>
+                    </ul>
+                {% endif %}
+                {% if m.get_to_open_rego_list %}
+                    <ul>
+                        <li>Upcoming options:</li>
+                        <ul>
+                        {% for option in m.get_to_open_rego_list %}
+                            <li><i>{{ option.name }}</i> will open on <i>{{ option.opens|date }}</i></li>
+                        {% endfor %}
+                        </ul>
+                    </ul>
+                {% endif %}
+                {% if m.get_closed_rego_list %}
+                    <ul>
+                        <li>Options currently closed:</li>
+                        <ul>
+                        {% for option in m.get_closed_rego_list %}
+                            <li><i>{{ option.name }}</i> has been closed since <i>{{ option.closes|date }}</i></li>
+                        {% endfor %}
+                        </ul>
+                    </ul>
+                {% endif %}
+{#                {% if m.is_rego_open %}Registration open until {{ m.get_rego_closes|date }}.#}
+{#                {% elif m.has_rego_closed %}Registration now closed.#}
+{#                {% else %}Registration opens {{ m.get_rego_opens|date }}.#}
+{#                {% endif %}#}
+            </p>
+        {% endfor %}
+</div>
+{#<br />#}
+<div class="float-left half left-vertical-line">
+    <h2>Need to change something?</h2>
+    <p>If you've already registered, but you need to alter something, please
+        contact <a href="mailto:{{ REGISTRATION_EMAIL }}">{{ REGISTRATION_EMAIL }}</a>.
+    </p>
+{#    <p>If you've already registered, but you need to alter something, please#}
+{#        contact <a href="mailto:ASA2018@astro.swin.edu.au">ASA2018@astro.swin.edu.au</a>.#}
+{#        However, you can do the following yourself:#}
+{#    </p>#}
+    {% for message in messages %}
+    <div class="{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% if success_message %}<div class="success">{{ success_message }}</div>{% endif %}
+    {% if error_message %}<div class="warning">{{ error_message|safe }}</div>{% endif %}
+    <h3>Abstract changes</h3>
+    <p>If you have already registered, and you wish to add, edit or withdraw an abstract,
+    please enter your email below and we will send you a link where you can do so.</p>
+    <h3>Still need to pay?</h3>
+    <p>Can't remember what you registered for, or still need to pay your outstanding
+    registration fees? Enter your email and click the 'Check registration' button to see a
+    summary of your registration, and pay for any outstanding items.</p>
+    <form action="{% url 'register_splash' %}" method="post">
+        {% csrf_token %}
+        {{ abstract_edit_form.as_p }}
+        <input type="submit" name="_abstract" value="Edit abstracts >" />
+        <input type="submit" name="_checkrego" value="Check registration >" />
+    </form>
+</div>
+<br />
+
+{% endblock %}

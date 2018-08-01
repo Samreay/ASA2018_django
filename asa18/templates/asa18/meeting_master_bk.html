@@ -1,0 +1,202 @@
+{% extends 'asa18/master.html' %}
+{% load staticfiles %}
+{% load asa18_extras %}
+
+{% block headextra %}
+
+<script>
+    $( document ).ready(function () {
+        // Fetch and insert the banner
+        $('#banner-top').css('background-image', "url({{ banner.img.url }})");
+        {% if banner.vert_position %}
+        $('#banner-top').css('background-position', 'center {{ banner.vert_position }}%');
+        {% endif %}
+
+        // Code for showing/hiding the mobile navigation
+        // Hide the nav group on load
+        $('#meeting-nav-top > g').hide();
+        // Bind a slideToggle action to the navigation link
+        $('#meeting-nav-top > a:first-child').click(function () {
+            $('#meeting-nav-top > g').slideToggle();
+        });
+
+        // Do 'stripey' rows for any table with the class "stripe-rows"
+        $('.stripe-rows tr:even').css('background-color', 'whitesmoke');
+
+    });
+</script>
+
+{% endblock %}
+
+{% block bannertop %}
+<p id="banner-title"><a href="/">{{ GLOBAL_PAGE_TITLE }}</a></p>
+{% endblock %}
+
+{% block content %}
+
+<div id="meeting-nav-top">
+    <a href="#">Navigation</a>
+    <g id="nav-top-items" style="width: 100%;">
+        {% if rego_open %}<a href="{% url 'register_splash' %}" class="bold nobefore" style="background-color:red;">Register</a>{% endif %}
+        <a href="/news/" class="bold nobefore">News</a>
+        {% for m in meetings %}
+        <a href="{{ m.get_absolute_url }}" class="bold nobefore" style="background-color:{{ m.distinct_color }};">{{ m.abbrv }}</a>
+        {% if m == meeting %}
+            {% if meeting.program_release_date %}
+                {% if meeting.program_release_date <= now or user.is_superuser %}
+                <a href="{{ meeting.get_absolute_participants_url }}">Participants</a>
+                <a href="{{ meeting.get_absolute_program_url }}">Program</a>
+                {% if meeting.has_accepted_posters %}<a href="{{ meeting.get_absolute_posters_url }}">Posters</a>{% endif %}
+                {% endif %}
+            {% endif %}
+            {% if m.slug == 'asa2018' %}<a href="{{ meeting.get_absolute_hpc_helpdesk_url }}">HPC Live Helpdesk</a>{% endif %}
+            {% if meeting.event_set.count > 0 %}
+            <a href="{{ meeting.get_absolute_event_url }}">Events</a>
+            {% for event in meeting.event_set.all %}
+                <a href="{{ event.get_absolute_url }}" class="subitem">{{ event.name }}</a>
+            {% endfor %}
+            {% endif %}
+            {% if meeting.prize_set.count > 0 %}
+            <a href="{{ m.get_absolute_prize_url }}">Prizes</a>
+                {% for prize in meeting.prize_set.all %}
+                <a href="{{ prize.get_absolute_url }}" class="subitem">{{ prize.name }}</a>
+                {% endfor %}
+            {% endif %}
+            {% if meeting.policy_set.count > 0 %}
+                <a href="{{ m.get_absolute_policy_url }}">Policies</a>
+            {% endif %}
+            {% if meeting.sponsor_set.count > 0 %}
+            <a href="{{ m.get_absolute_sponsors_url }}">Sponsors</a>
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+    </g>
+</div>
+
+<div id="master-wrapper">
+
+    <div id="meeting-nav-side">
+        {% if rego_open %}<a href="{% url 'register_splash' %}" class="bold nobefore" style="background-color:red;">Register</a>{% endif %}
+        <a href="/news/" class="bold nobefore">News</a>
+        {% for m in meetings %}
+        <a href="{{ m.get_absolute_url }}" class="bold nobefore" style="background-color:{{ m.distinct_color }};">{{ m.abbrv }}</a>
+        {% if m == meeting %}
+            {% if meeting.news_set.count > 0 %}
+            <a href="{{ meeting.get_absolute_news_url }}">News</a>
+            {% endif %}
+            {% if meeting.program_release_date %}
+                {% if meeting.program_release_date <= now or user.is_superuser %}
+                <a href="{{ meeting.get_absolute_participants_url }}">Participants</a>
+                <a href="{{ meeting.get_absolute_program_url }}">Program</a>
+                {% if meeting.has_accepted_posters %}<a href="{{ meeting.get_absolute_posters_url }}">Posters</a>{% endif %}
+                {% endif %}
+            {% endif %}
+            {% if m.slug == 'asa2018' %}<a href="{{ meeting.get_absolute_hpc_helpdesk_url }}">HPC Live Helpdesk</a>{% endif %}
+            {% if meeting.event_set.count > 0 %}
+            <a href="{{ meeting.get_absolute_event_url }}">Events</a>
+            {% for event in meeting.event_set.all %}
+                <a href="{{ event.get_absolute_url }}" class="subitem">{{ event.name }}</a>
+            {% endfor %}
+            {% endif %}
+            {% if meeting.prize_set.count > 0 %}
+            <a href="{{ m.get_absolute_prize_url }}">Prizes</a>
+                {% for prize in meeting.prize_set.all %}
+                <a href="{{ prize.get_absolute_url }}" class="subitem">{{ prize.name }}</a>
+                {% endfor %}
+            {% endif %}
+            {% if meeting.policy_set.count > 0 %}
+                <a href="{{ m.get_absolute_policy_url }}">Policies</a>
+            {% endif %}
+            {% if meeting.sponsor_set.count > 0 %}
+            <a href="{{ m.get_absolute_sponsors_url }}">Sponsors</a>
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <div id="content">
+    {% block content_meeting %}
+    <h1>{{ meeting.name }}</h1>
+
+        <p>
+            {% if meeting.regooption_set.count > 0 %}<a href="#rego-opts">Registration options</a>{% endif %}
+            {% if meeting.regooption_set.count > 0 and meeting.news_set.count > 0 %} | {% endif %}
+            {% if meeting.news_set.count > 0 %}<a href="#news">News</a>{% endif %}
+        </p>
+
+        {{ meeting.description|safe }}
+
+        <div class="clearboth"></div>
+        {% with meeting.regooption_set|public_only_regooption as regoopts %}{% if regoopts.count > 0 %}
+        <a name="rego-opts"></a>
+        <h2>Registration options
+            <span class="hint"> | All dates & times are in AEDT; all costs include GST</span></h2>
+        <table class="stripe-rows" style="min-width: 75%;">
+            <tr><th>Registration</th><th>Cost</th><th>Opens</th><th>Closes</th></tr>
+        {% for option in regoopts %}
+            <tr><td>{{ option.name }}</td><td style="text-align:right;">${{ option.cost }}</td>
+            <td>{{ option.opens }}</td><td>{{ option.closes }}</td></tr>
+        {% endfor %}
+        </table>
+        {% if meeting.has_rego_closed %}<p>Registration for this meeting has now closed.</p>
+        {% else %}<p>To register for this meeting, use our <a href="{% url 'register_splash' %}">registrations portal</a>.
+        {% endif %}
+        {% endif %}{% endwith %}
+
+        {% if meeting.news_set.count > 0 %}
+        <a name="news"></a>
+        <div class="half float-left">
+        {% with meeting.news_set.first as m %}
+            <h3 class="limit-margin-bottom hint" style="font-size: 1rem;">Latest news</h3>
+            <h2 class="limit-margin-top">{{ m.title }}<span class="hint"> | {{ m.pub_date }}</span></h2>
+            {{ m.body|safe|truncatewords_html:50 }}
+            <a href="{{ m|get_meeting_url:meeting.slug }}">Read more &rarr;</a>{% if meeting.news_set.count > 1 %} | <a href="{{ meeting.get_absolute_news_url }}">All {{ meeting.abbrv }} news</a>{% endif %}
+        {% endwith %}{% endif %}
+        </div>
+
+        {% if meeting.event_set.count > 0 %}
+        <div class="half float-left">
+            {% with meeting.event_set.all|random as event %}
+            <h3 class="limit-margin-bottom hint" style="font-size: 1rem;">Featured event</h3>
+            <h2 class="limit-margin-top limit-margin-bottom">{{ event.name }}</h2>
+            <div class="blurb-box" style="background-color:{{ meeting.distinct_color }}; color: white; width: 100%; float:none; display: inline-block; top:auto; margin-left: 0;">
+            <table style="width:100%;">
+                <tr><th>When:</th><td>
+                    {{ event.time_start|date:'D j M Y, g:iA' }} - {% if event.time_end|date:'jMY' != event.time_start|date:'jMY' %}{{ event.time_end|date:'D j M Y, g:iA' }}{% else %}{{ event.time_end|date:'g:iA' }}{% endif %}
+                </td></tr>
+                {% if event.location %}
+                <tr><th>Where:</th><td>{{ event.location|safe }}</td></tr>
+                {% endif %}
+                {% if event.cost %}
+                <tr><th>Cost:</th><td>${{ event.cost|floatformat:2 }}AUD</td></tr>
+                {% endif %}
+                {% if event.eventoption_set.count > 0 %}
+                <tr><th colspan="2" style="text-align:center;">Registration closes {{ event.compute_rego_closes }}</th></tr>
+                {% else %}
+                <tr><th colspan="2" style="text-align:center;">No registration required</th></tr>
+                {% endif %}
+            </table>
+            </div>
+            {{ event.description|safe|truncatewords_html:50 }}
+            <a href="{{ meeting.get_absolute_event_url }}{{ event.get_relative_url }}">Read more &rarr;</a>{% if meeting.event_set.count > 1 %} | <a href="{{ meeting.get_absolute_event_url }}">All {{ meeting.abbrv}} events</a>{% endif %}
+            {% endwith %}
+        </div>
+        {% endif %}
+
+        <div class="clearboth"></div>
+
+        {% if meeting.sponsor_set.count > 0 %}
+        <h2>Sponsors</h2>
+        <p>{{ meeting.name }} is proudly sponsored by the following organizations and companies:</p>
+        <div class="spon-sor-logo-table">
+        {% for sponsor in meeting.sponsor_set.all %}<a href="{{ sponsor.url }}" target="_blank"><img src="{{ sponsor.logo.url }}" class="spon-sor-logo"/></a> {% endfor %}
+        {% endif %}
+	<p><h3>We acknowledge support from the Hunstead gift for Astrophysics at the Sydney Institute for Astronomy.</h3></p>
+        <p><h3>We thank the School of Science at Swinburne University for their support.</h3></p>
+        <p><h3>The Rainbow Dinner is sponsored by People & Culture at Swinburne University.</h3></p>
+</div>
+
+    {% endblock %}</div>
+
+</div>
+{% endblock %}

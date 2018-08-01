@@ -1,0 +1,119 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load asa18_extras %}
+
+{% block headextra %}
+{{ block.super }}
+
+<script>
+   $( document ).ready(function () {
+      $('.dialog-holder').hide();
+      $('.abortable-form input[type=submit][name=_abort]').on('click', function (e) {
+         e.preventDefault();
+         var $this = $(this);
+         $('.dialog-holder').dialog({
+            title: "Please confirm",
+            content: "Are you sure you want to cancel your registration? This will delete all your data from the registration system, and is irreversible.",
+            modal: true,
+            buttons: {
+               "Cancel registration": function () { $this.unbind('click'); $this.trigger('click'); },
+               "No, don't": function () { $( this ).dialog('close'); }
+            },
+         });
+      });
+   });
+</script>
+
+{% endblock %}
+
+{% block content_meeting %}
+
+<h3 class="limit-margin-bottom">Registration for {{ attendee.full_name }}</h3>
+<h1 class="limit-margin-top">Step 4 - Events</h1>
+
+<div class="warning">Do NOT use your Back, Forward or Refresh buttons.<br />
+If you need to leave the registration system, please use the 'Cancel' button below
+ - do NOT simply leave the page!</div>
+
+<p>You have now been entered into our registration system. You are now
+required to complete the registration process in this sitting. If you are
+unable to do so, please use the 'Cancel' button at the bottom of the page.</p>
+
+<p>Based on your registration responses, we have identified conference
+events that you may wish to attend.</p>
+
+<p>All prices include GST.</p>
+
+<p>If you encounter any issues during your registration process, please
+    contact <a href="mailto:{{ REGISTRATION_EMAIL }}">{{ REGISTRATION_EMAIL }}</a>.</p>
+
+<form action="{% url 'register_events' %}" method="post" class="abortable-form">
+   {% csrf_token %}
+
+   {% for event, regos in event_dict.items %}
+      <g id="{{ event.slug }}">
+      {% if event.dietary_required %}
+       <script>
+           $( document ).ready(function () {
+              // Show the correct number of options for the initially selected
+              // option (may not be none if someone has been naughty and used
+              // refresh
+              $("div[id*='{{ event.slug }}'][class='subform-ul-div']").hide();
+              $("div[id*='{{ event.slug }}'][class='subform-ul-div']").slice(0, $("input[id*='{{ event.slug }}']:checked").closest('div').attr('guests')).show();
+
+              // Bind show/hide for dietary options to the option change trigger
+              // Blank any forms that will remain hidden
+              $("input[id*='{{ event.slug }}'][type='radio']").change(function () {
+                $("div[id*='{{ event.slug }}'][class='subform-ul-div']").hide();
+                $("div[id*='{{ event.slug }}'][class='subform-ul-div']").slice(0, $(this).closest('div').attr('guests')).show();
+                $("div[id*='{{ event.slug }}'][class='subform-ul-div']").slice($(this).closest('div').attr('guests')).find("input:checkbox").prop('checked',false);
+                $("div[id*='{{ event.slug }}'][class='subform-ul-div']").slice($(this).closest('div').attr('guests')).find("input:text").val('');
+              });
+           })
+       </script>
+      {% endif %}
+
+      <h3>{{ event.name }} <a href="{{ event.get_absolute_url }}"
+                                target="_blank">(see event description &#8663;)</a> </h3>
+      {{ regos.non_field_errors }}
+      {{ regos.attendee }}{{ regos.event }}
+      {% for option in regos.event_option %}
+      {{ option.value }}
+      <div class="form-options" guests="{% for obj in regos.event_option.field.queryset%}{% if obj.name in option.choice_label %}{{ obj.extra_guests|add:'1' }}{% endif %}{% endfor %}">
+         {{ option }}
+      </div>
+      {% endfor %}
+
+      {% for f_event, formset in dietary_formset_dict.items %}
+            {% if f_event == event %}
+          {{ formset.management_form }}
+            <p>For each attendee, please select any/all applicable dietary restrictions. If there are none, simply leave blank.</p>
+               {% for form in formset %}
+                {% comment %}{{ form.id }}{% endcomment %}
+            <div class="subform-ul-div" id="{{f_event.slug}}-restrict-{{forloop.counter}}">
+               {{ form.restriction.label }}:
+               {{ form.restriction }}
+               <g class="hint">{{ form.restriction.help_text }} {{ form.other_restriction.help_text }}:</g>
+               {{ form.other_restriction }}<br />
+            </div>
+               {% endfor %}
+            <div class="clearboth"></div>
+            {% endif %}
+      {% endfor %}
+
+      <p>{{ regos.extra_comments.help_text }}:<br/>
+          {{ regos.extra_comments }} </p>
+
+      </g>
+   {% endfor %}
+
+
+   <br /><input type="submit" value="Continue >" /><br /><br />
+   <input type="submit" name="_abort"
+          value="Cancel registration" style="background-color: red;" />
+</form>
+
+<div class="dialog-holder" title="Are you sure?" style="display: none;">
+   <p>Are you sure you want to cancel your registration? This will delete all your data from the registration system, and is irreversible.</p>
+</div>
+
+{% endblock %}

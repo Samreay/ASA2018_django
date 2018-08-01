@@ -1,0 +1,37 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+
+{% block content_meeting %}
+
+<h1>{{ prize.name }}</h1>
+{% if prize.named_for %}
+<div class="blurb-box" style="background-color: {% if meeting %}{{ meeting.distinct_color }}{% else %}black{% endif %}; color: white;">
+    <h2 style="text-align:center;"><span class="hint" style="color: white;">Prize named for</span><br />
+    {{ prize.named_for }}</h2>
+    {% if prize.honoree_pic %}<img src="{{ prize.honoree_pic.url }}" />{% endif %}
+    {% if prize.honoree_info %}{{ prize.honoree_info|safe }}{% endif %}
+</div>
+{% endif %}
+{% if meeting %}<h3>{{ meeting.name }}</h3>{% endif %}
+
+{{ prize.about|safe }}
+
+{% if prize.awardee %}
+<h1><span class="hint">The {{ GLOBAL_PAGE_TITLE }} {{ prize.name }} is awarded to</span><br />
+    {{ prize.awardee.full_name }}</h1>
+{% endif %}
+
+{% if prize.citation %}
+{{ prize.citation|safe }}
+{% endif %}
+
+{% if prize.talk %}
+<h2><span class="hint">Prize talk</span><br />{{ prize.talk.title }}</h2>
+<p style="font-style:italic;">{% if prize.talk.session %}{{ prize.talk.session.title }}, {% endif %}
+    {% if prize.talk.id_no %}{{ prize.talk.generate_id }}, {% endif %}
+{% if prize.talk.time_start %}{{ prize.talk.time_start|date:'D, j M, g:i' }}{% if prize.talk.time_start|date:'a' != prize.talk.time_end|date:'a' %} {{ prize.talk.time_start|date:'a' }} {% endif %}&ndash;{{ prize.talk.time_end|date:'g:i a' }}, {% endif %}
+{% if prize.talk.session.location %}{{ prize.talk.session.location }}{% endif %}</p>
+{{ prize.talk.abstract|safe }}
+{% endif %}
+
+{% endblock %}

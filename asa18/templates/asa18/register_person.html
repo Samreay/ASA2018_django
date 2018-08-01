@@ -1,0 +1,139 @@
+{% extends 'asa18/meeting_master.html' %}
+
+{% block content_meeting %}
+
+<h3 class="limit-margin-bottom">Registration</h3>
+<h1 class="limit-margin-top">Step 1 - You!</h1>
+
+<p><strong>All</strong> questions on this page must be answered; however, some of
+them have a 'Do not disclose' option.</p>
+
+<p>If you encounter any issues during your registration process, please
+    contact <a href="mailto:{{ REGISTRATION_EMAIL }}">{{ REGISTRATION_EMAIL }}</a>.</p>
+
+<form action="{% url 'register_person' %}" method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}<g class="errorlist">{{ form.non_field_errors.as_ul }}</g>{% endif %}
+
+    <table class="form-table">
+        <tr><td colspan="2"><h3>Your information</h3></td> </tr>
+
+        <tr><td class="label">{{ form.given_names.label }}: </td><td>{{ form.given_names }}</td></tr>
+        {% if form.given_names.help_text %}<tr><td colspan="2" class="hint">{{ form.given_names.help_text }}</td></tr>{% endif %}
+        {% if form.given_names.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.given_names.errors.as_ul }}</td></tr>
+        {% endif %}
+
+        <tr><td class="label">{{ form.family_name.label }}: </td><td>{{ form.family_name }}</td></tr>
+        {% if form.family_name.help_text %}<tr><td colspan="2" class="hint">{{ form.family_name.help_text }}</td></tr>{% endif %}
+        {% if form.family_name.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.family_name.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        {#<tr><td class="label">{{ form.name_order.label }}: </td><td>{{ form.name_order }}</td></tr>#}
+        {#{% if form.name_order.help_text %}<tr><td colspan="2" class="hint">{{ form.name_order.help_text }}</td></tr>{% endif %}#}
+        {#{% if form.name_order.errors %}#}
+        {#<tr><td colspan="2" class="hint errorlist">{{ form.name_order.errors.as_ul }}</td></tr>#}
+        {#{% endif %}#}
+        
+        <tr><td class="label">{{ form.email.label }}: </td><td>{{ form.email }}</td></tr>
+        {% if form.email.help_text %}<tr><td colspan="2" class="hint">{{ form.email.help_text }}</td></tr>{% endif %}
+        {% if form.email.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.email.errors.as_ul }}</td></tr>
+        {% endif %}
+
+        <tr><td class="label">{{ form.phone.label }}: </td><td>{{ form.phone }}</td></tr>
+        {% if form.phone.help_text %}<tr><td colspan="2" class="hint">{{ form.phone.help_text }}</td></tr>{% endif %}
+        {% if form.phone.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.phone.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.address.label }}: </td><td>{{ form.address }}</td></tr>
+        {% if form.address.help_text %}<tr><td colspan="2" class="hint">{{ form.address.help_text }}</td></tr>{% endif %}
+        {% if form.address.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.address.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.city.label }}: </td><td>{{ form.city }}</td></tr>
+        {% if form.city.help_text %}<tr><td colspan="2" class="hint">{{ form.city.help_text }}</td></tr>{% endif %}
+        {% if form.city.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.city.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.state.label }}: </td><td>{{ form.state }}</td></tr>
+        {% if form.state.help_text %}<tr><td colspan="2" class="hint">{{ form.state.help_text }}</td></tr>{% endif %}
+        {% if form.state.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.state.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.country.label }}: </td><td>{{ form.country }}</td></tr>
+        {% if form.country.help_text %}<tr><td colspan="2" class="hint">{{ form.country.help_text }}</td></tr>{% endif %}
+        {% if form.country.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.country.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.postcode.label }}: </td><td>{{ form.postcode }}</td></tr>
+        {% if form.postcode.help_text %}<tr><td colspan="2" class="hint">{{ form.postcode.help_text }}</td></tr>{% endif %}
+        {% if form.postcode.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.postcode.errors.as_ul }}</td></tr>
+        {% endif %}
+
+        <tr><td colspan="2"><h3>Academic information</h3></td> </tr>
+
+        <tr><td class="label">{{ form.institution.label }}: </td><td>{{ form.institution }}</td></tr>
+        {% if form.institution.help_text %}<tr><td colspan="2" class="hint">{{ form.institution.help_text }}</td></tr>{% endif %}
+        {% if form.institution.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.institution.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.academic_level.label }}: </td><td>{{ form.academic_level }}</td></tr>
+        {% if form.academic_level.help_text %}<tr><td colspan="2" class="hint">{{ form.academic_level.help_text }}</td></tr>{% endif %}
+        {% if form.academic_level.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.academic_level.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.is_asa_member.label }}</td><td>{{ form.is_asa_member }}</td></tr>
+        {% if form.is_asa_member.help_text %}<tr><td colspan="2" class="hint">{{ form.is_asa_member.help_text }}</td></tr>{% endif %}
+        {% if form.is_asa_member.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.is_asa_member.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.is_nz_astro.label }}</td><td>{{ form.is_nz_astro }}</td></tr>
+        {% if form.is_nz_astro.help_text %}<tr><td colspan="2" class="hint">{{ form.is_nz_astro.help_text }}</td></tr>{% endif %}
+        {% if form.is_nz_astro.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.is_nz_astro.errors.as_ul }}</td></tr>
+        {% endif %}
+
+        <tr><td><hr class="rulemain" /></td></tr>
+
+        <tr><td colspan="2"><h3>Equity &amp; Diversity Information</h3>
+        The collection of this information is designed to help the conference organizers track equity and diversity targets.<br/>
+        You must respond to these questions; however, there is a 'Do not disclose' option if you do not
+        wish to share this information.</td></tr>
+        
+        <tr><td class="label">{{ form.gender.label }}: </td><td>{{ form.gender }}</td></tr>
+        {% if form.gender.help_text %}<tr><td colspan="2" class="hint">{{ form.gender.help_text }}</td></tr>{% endif %}
+        {% if form.gender.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.gender.errors.as_ul }}</td></tr>
+        {% endif %}
+        
+        <tr><td class="label">{{ form.years_since_phd.label }}: </td><td>{{ form.years_since_phd }}</td></tr>
+        {% if form.years_since_phd.help_text %}<tr><td colspan="2" class="hint">{{ form.years_since_phd.help_text }}</td></tr>{% endif %}
+        {% if form.years_since_phd.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.years_since_phd.errors.as_ul }}</td></tr>
+        {% endif %}
+
+        <tr><td><hr class="rulemain" /></td></tr>
+
+        <tr><td class="label">Are you a robot? Please enter the letters you see in the image.</td><td>{{ form.captcha }}</td></tr>
+        {% if form.captcha.help_text %}<tr><td colspan="2" class="hint">{{ form.captcha.help_text }}</td></tr>{% endif %}
+        {% if form.captcha.errors %}
+        <tr><td colspan="2" class="hint errorlist">{{ form.captcha.errors.as_ul }}</td></tr>
+        {% endif %}
+
+    </table><br />
+    <input type="submit" value="Continue >" />
+</form>
+
+{% endblock %}

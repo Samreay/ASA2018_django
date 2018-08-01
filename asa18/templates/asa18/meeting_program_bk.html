@@ -1,0 +1,246 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+{% load asa18_extras %}
+
+{% block headextra %}
+{{ block.super }}
+
+<!-- JQuery UI -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{% static 'asa18/js/moment-with-locales.js' %}"></script>
+<script src="{% static 'asa18/js/moment-timezone-with-data.js' %}"></script>
+<script>
+    var markers, startTimes, endTimes, dtnow, nowFlex, failedNow ;
+    dtnow = new Date();
+    nowFlex = 120. * 60000.  // Minutes, in microseconds
+    failedNow = 0 ;
+    $( document ).ready(function () {
+        $( '.tabs' ).tabs();
+        $( '.accordion' ).accordion({
+            collapsible: true,
+            active: false,
+            heightStyle: "content",
+        });
+
+        var amountScrolled = 75;
+        if ( $(window).scrollTop() > amountScrolled ) {
+            $('#go-to-now-link').fadeIn('slow');
+        }
+        $(window).scroll(function() {
+            if ( $(window).scrollTop() > amountScrolled ) {
+                $('#go-to-now-link').fadeIn('slow');
+            } else {
+                $('#go-to-now-link').fadeOut('slow');
+            }
+        });
+
+        // Bind an event to all internal anchor links to enable
+        // smooth scrolling
+        $(" a[href^='#']:not(.ui-tabs-anchor) ").click(function (e) {
+            e.preventDefault();
+            $( 'body' ).animate({
+                scrollTop: $('[name=' + $( this ).attr('href').slice(1) + ']').offset().top + $( 'body' ).scrollTop()
+            }, 500, 'swing');
+        });
+
+        // Get the names of all the time blocks markers
+        markers = $('.timeblock_marker').map(function () {
+            return this.name;
+        }).get();
+        // Make arrays of start and end times
+        startTimes = $.map(markers, function (n, i) {
+            return moment(n.split('_')[0], 'YYYYMMDDHHmm').toDate();
+        });
+        endTimes = $.map(markers, function (n, i) {
+            return moment(n.split('_')[1], 'YYYYMMDDHHmm').toDate();
+        });
+
+        // Attach the jump-to function to the click event of the now button
+        $('#go-to-now-link').click(function () {
+            // Update the current date
+            dtnow = new Date();
+
+            var block_i ;
+            var found = false ;
+            // See if we are in a known time block
+            for (i = 0; i < markers.length; i++ ) {
+                if (startTimes[i] <= dtnow && endTimes[i] >= dtnow ) {
+                    found = true ;
+                    block_i = i ;
+                    break ;
+                }
+            }
+            // Otherwise, see if we're within nowFlex minutes of the next block
+            if (!found) {
+                for (i = 0; i < markers.length; i++ ) {
+                    if ((dtnow + nowFlex) >= startTimes[i]) {
+                        found = true ;
+                        block_i = i ;
+                        break ;
+                    }
+                }
+            }
+
+            // If found, go to that block; otherwise, shake the button
+            if ( found ) {
+                var yscroll = $('.timeblock_marker[name=' + markers[block_i] + ']') ;
+                $( 'body' ).animate({
+                    scrollTop: $('.timeblock_marker[name=' + markers[block_i] + ']').offset().top + $( 'body' ).scrollTop()
+                }, 1000, 'swing');
+            } else {
+                $('#go-to-now-link').effect('shake', { distance: 10 });
+                failedNow += 1 ;
+                if (failedNow === 3) {
+                    // alert('The "now" functionality only works if there is something on right now, or within two hours.');
+                    $('.dialog-holder').dialog({
+                        title: "There's nothing on!",
+                        modal: true,
+                        show: 'slideDown',
+                    });
+                }
+            }
+        });
+
+    });
+</script>
+<style>
+    .ui-widget {
+        font-family: inherit;
+    }
+    .ui-tabs-active, .ui-state-active {
+        background-color: {{ meeting.distinct_color }} !important;
+    }
+    .ui-tabs-active a, .ui-state-active a {
+        color: white !important;
+    }
+    .ui-tabs li {
+        max-width: 100%;
+    }
+    .ui-tabs li a {
+        max-width: 100%;
+        overflow: hidden;
+        word-wrap: break-word;
+        text-overflow: ellipsis;
+    }
+    #go-to-now-link, #go-to-now-link:hover, #go-to-now-link:visited {
+        height: 60px;
+        width: 60px;
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        border-radius: 25px;
+        line-height: 58px;
+        text-align: center;
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        font-family: 'Raleway', serif;
+        font-weight: bold;
+        font-size: 20px;
+        color: white;
+        background-color: {{ meeting.distinct_color }};
+        border: 1px solid black;
+        box-sizing: border-box;
+        text-decoration: none;
+        z-index: 99;
+        display: none;
+        cursor: pointer;
+    }
+    #go-to-now-link:hover {
+        border: 1px solid red;
+    }
+
+</style>
+
+
+<!-- MathJax -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+{% endblock %}
+
+{% block content_meeting %}
+
+<span id="go-to-now-link" title="Jump to now!">Now</span>
+
+<a name="page-top"></a>
+<h1>{{ meeting.name }} &ndash; Program</h1>
+
+<p>Click on session headings to view the session; click on talk titles to view their abstracts.</p>
+
+{% if meeting.program_release_date <= now %}{% if meeting.program_hardcopy %}
+<p>If you'd like to download a copy of the program, you may do so from <a href="{{ meeting.program_hardcopy.url }}">here</a> ({{ meeting.program_hardcopy.size|filesizeformat }}).</p>
+{% endif %}{% endif %}
+
+<p>{% for d in program_dates %}<a href="#{{ d|date:'Ymd' }}">{{ d|date:"D, j M" }}</a>{% if not forloop.last %} | {% endif %}{% endfor %}</p>
+
+{% for d in program_dates %}
+{% if not forloop.first %}<hr class="rulemain" style="margin-top: 2rem; "/>{% endif %}
+<a name="{{ d|date:'Ymd' }}"></a><h2>{{ d|date:"D, j M" }}</h2>
+    {% with program_dict|get_dict_item:d as today_stuff %}
+        <p>{% for time_block in today_stuff %}
+            <a href="#{{ time_block.0.time_start|date:'YmdHi' }}_{{ time_block|max_time_end|date:'YmdHi' }}">
+                {{ time_block.0.time_start|date:'g:i' }}{% if time_block.0.time_start|date:'a' != time_block|max_time_end|date:'a' %} {{ time_block.0.time_start|date:'a' }} {% endif %}&ndash;{{ time_block|max_time_end|date:'g:i a' }}
+            </a>{% if not forloop.last %} | {% endif %}
+        {% endfor %}</p>
+
+        {% for time_block in today_stuff %}
+        <a name="{{ time_block.0.time_start|date:'YmdHi' }}_{{ time_block|max_time_end|date:'YmdHi' }}" class="timeblock_marker"></a>
+        <h4>{{ time_block.0.time_start|date:'D, j M' }}, {{ time_block.0.time_start|date:'g:i a' }} to {{ time_block|max_time_end|date:'g:i a' }}
+            <span class="hint"><a href="#{{ d|date:'Ymd' }}" class="hint" style="color: inherit;">Day &uarr;</a> <span style="font-family: 'Raleway', serif;">|</span> <a href="#page-top" class="hint" style="color:inherit">Top &uarr;</a></span></h4>
+            <div class="tabs"><ul>
+            {% for thing in time_block %}
+                <li><a href="#{{ thing.slug }}" {% if thing|get_object_type == 'event' %}style="font-weight: bold;"{% endif %}>{{ thing.title|truncatechars:25 }}
+                    {% if thing|get_object_type == 'session' %}{% if thing.blurb %} ({{ thing.blurb|truncatechars:15 }}){% endif %}{% endif %}<br />
+                    {{ thing.time_start|date:'g:i a' }} &ndash; {{ thing.time_end|date:'g:i a' }}</a></li>
+            {% endfor %}
+            </ul>
+
+            {% for thing in time_block %}
+                <div id="{{ thing.slug }}">
+                    <a name="{{ thing.slug }}"></a>
+                    <h3>{{ thing.title }}{% if thing|get_object_type == 'session' %}{% if thing.blurb %} &ndash; {{ thing.blurb }}{% endif %}{% endif %}</h3>
+                    {% if thing|get_object_type == 'event' %}
+                        {% if thing.eventregistration_set.count > 0 %}<p style="font-weight:bold;">Registration required</p>{% endif %}
+                        <p>{{ thing.time_start|date:'g:i a' }} &ndash; {{ thing.time_end|date:'g:i a' }}{% if thing.location %} @ {{ thing.location|safe }}{% endif %}</p>
+                        {{ thing.description|safe|truncatewords_html:50 }}
+                        <p><a href="{{ thing.get_absolute_url }}">More info &rarr;</a></p>
+                    {% elif thing|get_object_type == 'session' %}
+                    {% if thing.location or thing.chair %}<p style="font-style:italic;">
+                        {% if thing.location %}{{ thing.location|safe }}{% if thing.chair %} &mdash; {% endif %}{% endif %}
+                        {% if thing.chair %}Chair: <strong>{{ thing.chair|capitalize_family:1 }}</strong>{% if thing.chair.institution %}, {{ thing.chair.institution }}{% endif %}{% endif %}
+                    </p>{% endif %}
+                        {% if thing.extended_description %}{{ thing.extended_description|safe }}{% endif %}
+                        {% if thing.presentation_set.count > 0 %}<div class="accordion">
+                            {% for talk in thing.presentation_set.all %}
+                                <h3><span style="font-family: 'Raleway',serif; font-weight: 400;">{% if talk.id_no %}{{ talk.generate_id }},
+                                    {% endif %}{{ talk.time_start|date:'g:i' }}{% if talk.time_start|date:'a' != talk.time_end|date:'a' %} {{ talk.time_start|date:'a' }} {% endif %}&ndash;{{ talk.time_end|date:'g:i a' }} &mdash; </span>{{ talk.title }}
+                                    {% if talk.prize_set.count > 0 %} ({% with talk.prize_set.all|first as pr %}{{ pr.name }}{% endwith %} talk){% endif %}<br />
+                                    {{ talk.presenter|capitalize_family:1 }}<span style="font-family: 'Raleway',serif; font-weight: 400;">, {{ talk.presenter.institution }}</span></h3>
+                    <div>{% if talk.prize_set.count > 0 %}{% with talk.prize_set.all|first as pr %}<p style="font-weight:bold;text-align:center;">&rArr; This talk is by the winner of the <a href="{{ pr.get_absolute_url }}" target="_blank">{{ pr.name }}</a> &lArr;</p>{% endwith %}{% endif %}
+                                    {% if talk.abstract %}{{ talk.abstract|safe }}{% else %}<p>No abstract provided.</p>{% endif %}</div>
+                            {% endfor %}
+                        </div>{% endif %}
+                    {% else %}
+                        <p class="warning">Unknown schedule object!</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+                </div>
+            <!--<div class="clearboth"></div>-->
+        {% endfor %}
+
+    {% endwith %}
+
+{% endfor %}
+
+<div class="dialog-holder" title="There's nothing on!" style="display:none;">
+    <p>The "Now" functionality only works if there is something on right now, or within the next two hours.</p>
+</div>
+
+{% endblock %}

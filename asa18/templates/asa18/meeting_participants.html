@@ -1,0 +1,202 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load asa18_extras %}
+{% load staticfiles %}
+
+{% block headextra %}
+{{ block.super }}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+
+<script src="{% static 'asa18/js/list.min.js' %}"></script>
+<script>
+    $( document ).ready(function () {
+        var attendeeList = new List('searchable-area', {
+            valueNames: ['attendee-name', 'attendee-inst', ],
+            listClass: 'searchable-list',
+        });
+
+        var arcColorArray = [
+            'blue',
+            'crimson',
+            'forestgreen',
+            'gold',
+            'orangered',
+            'deeppink',
+            'chartreuse',
+            'peru',
+            'purple',
+            'deepskyblue',
+        ];
+
+        Chart.defaults.doughnut.tooltips.callbacks.label = function (tooltipItem, data) {
+          //get the concerned dataset
+          var dataset = data.datasets[tooltipItem.datasetIndex];
+          //calculate the total of this data set
+          var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
+            return previousValue + currentValue;
+          });
+          //get the current items value
+          var currentValue = dataset.data[tooltipItem.index];
+          //calculate the precentage based on the total and current item, also this does a rough rounding to give a whole number
+          var precentage = Math.floor(((currentValue/total) * 100)+0.5);
+          var label = data.labels[tooltipItem.index];
+
+          return " " + label + ": " + currentValue + " (" + precentage + "%)";
+        }
+
+        {% comment %}
+        // Set-up default text for the Canvas objects
+        $( 'canvas[id^="chart-"]' ).each(function (index, element) {
+            var context = element.getContext('2d');
+            context.font = '14px Verdana' ;
+            context.textAlign = 'center' ;
+            context.fillText('Insufficient data!', element.width / 2, element.height / 2);
+        });
+        {% endcomment %}
+
+        {% with meeting.generate_attendee_gender as gender_data %}{% if gender_data.0|length > 0 %}
+        var chartGenderTotal = new Chart($('#chart-gender-total'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: {{ gender_data.1 }},
+                    backgroundColor: arcColorArray,
+                }],
+                labels: {{ gender_data.0|safe }},
+            },
+        });
+        {% endif %}{% endwith %}
+
+        {% with meeting|get_attendees_gender_pres:'t' as gender_data %}{% if gender_data.0|length > 0 %}
+        var chartGenderTalk = new Chart($('#chart-gender-talk'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: {{ gender_data.1 }},
+                    backgroundColor: arcColorArray,
+                }],
+                labels: {{ gender_data.0|safe }},
+            },
+        });
+        {% endif %}{% endwith %}
+
+        {% with meeting|get_attendees_gender_pres:'p' as gender_data %}{% if gender_data.0|length > 0 %}
+        var chartGenderPoster = new Chart($('#chart-gender-poster'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: {{ gender_data.1 }},
+                    backgroundColor: arcColorArray,
+                }],
+                labels: {{ gender_data.0|safe }},
+            },
+        });
+        {% endif %}{% endwith %}
+
+        {% with meeting.generate_attendee_level as gender_data %}{% if gender_data.0|length > 0 %}
+        var chartGenderTotal = new Chart($('#chart-level-total'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: {{ gender_data.1 }},
+                    backgroundColor: arcColorArray,
+                }],
+                labels: {{ gender_data.0|safe }},
+            },
+        });
+        {% endif %}{% endwith %}
+
+        {% with meeting|get_attendees_level_pres:'t' as gender_data %}{% if gender_data.0|length > 0 %}
+        var chartGenderTalk = new Chart($('#chart-level-talk'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: {{ gender_data.1 }},
+                    backgroundColor: arcColorArray,
+                }],
+                labels: {{ gender_data.0|safe }},
+            },
+        });
+        {% endif %}{% endwith %}
+
+        {% with meeting|get_attendees_level_pres:'p' as gender_data %}{% if gender_data.0|length > 0 %}
+        var chartGenderPoster = new Chart($('#chart-level-poster'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: {{ gender_data.1 }},
+                    backgroundColor: arcColorArray,
+                }],
+                labels: {{ gender_data.0|safe }},
+            },
+        });
+        {% endif %}{% endwith %}
+
+
+    });
+</script>
+
+{% endblock %}
+
+{% block content_meeting %}
+
+<h1>{{ meeting.name }} &ndash; Participants</h1>
+
+<p><a href="#participants-list">List</a> | <a href="#gender-career">Gender &amp; Career Diversity</a></p>
+
+<p>This page lists information about those attending {{ meeting.name }}. All
+effort has been made to anonymise any summary data shown on this page. If you feel
+the information on this page in some way identifies a specific person
+adversely, please contact
+    {% if "Harley" not in meeting.name %}
+        <a href="ASA2018@astro.swin.edu.au">ASA2018@astro.swin.edu.au</a> as soon as possible.</p>
+    {% else  %}
+        <a href="HWSA2018@astro.swin.edu.au">HWSA2018@astro.swin.edu.au</a> as soon as possible.</p>
+    {% endif %}
+
+<div id="searchable-area">
+<a name="participants-list"></a><h2>Participants list (total: {{ attendee_list.count }})</h2>
+    <p>&spades; Local organising committee<br/>
+    &hearts; Scientific organising committee<br/>
+    <span class="hint">This page should <strong>not</strong> be used to determine if a participant
+    has successfully settled their registration payments.</span></p>
+    <p>You may use this search box to filter the participants list by name and/or institution.</p>
+<input class="search" placeholder="Search" /><br />
+
+<div style="height: 240px; overflow-y: scroll; overflow-x: hidden; ">
+    <p class="searchable-list">{% for a in attendee_list %}<g><span class="attendee-name">{{ a|capitalize_family:"True" }}</span>
+        {% if a in meeting_loc %}&spades;{% endif %}{% if a in meeting_soc %}&hearts;{% endif %}
+        <span class="hint attendee-inst">({{ a.institution }})</span>
+        {% if not forloop.last %}<br/></g>{% endif %}
+        {% endfor %}</p>
+</div></div>
+
+<a name="gender-career"></a><h2>Gender &amp; Career Diversity Statistics</h2>
+
+<p>Gender/career responses have been grouped (and possibly eliminated if the subsequent grouping is not large enough) when that particular response accounts for less than 1.5% of all responses,
+or if the response has fewer than three data points. Percentages shown in the chart tooltips are relative to the number of data points shown
+    (i.e. total responses, less the number of hidden responses).</p>
+
+<p>Click on the legend title of any response to hide/show that response in the relevant chart.</p>
+
+<div class="half float-left center">
+    <h3>Gender statistics</h3>
+    <h4>All attendees</h4>
+    <canvas id="chart-gender-total" style="width: 280px; height: 400px; max-width: 280px; margin-left: auto; margin-right: auto;"></canvas>
+    {% if meeting.has_accepted_talks %}<h4>Talk authors</h4>
+    <canvas id="chart-gender-talk" style="width: 280px; height: 400px; max-width: 280px; margin-left: auto; margin-right: auto;"></canvas>{% endif %}
+    {% if meeting.has_accepted_posters %}<h4>Poster authors</h4>
+    <canvas id="chart-gender-poster" style="width: 280px; height: 400px; max-width: 280px; margin-left: auto; margin-right: auto;"></canvas>{% endif %}
+</div>
+
+<div class="half float-right center">
+    <h3>Career statistics</h3>
+    <h4>All attendees</h4>
+    <canvas id="chart-level-total" style="width: 280px; height: 400px; max-width: 280px; margin-left: auto; margin-right: auto;"></canvas>
+    {% if meeting.has_accepted_talks %}<h4>Talk authors</h4>
+    <canvas id="chart-level-talk" style="width: 280px; height: 400px; max-width: 280px; margin-left: auto; margin-right: auto;"></canvas>{% endif %}
+    {% if meeting.has_accepted_posters %}<h4>Poster authors</h4>
+    <canvas id="chart-level-poster" style="width: 280px; height: 400px; max-width: 280px; margin-left: auto; margin-right: auto;"></canvas>{% endif %}
+</div>
+
+{% endblock %}

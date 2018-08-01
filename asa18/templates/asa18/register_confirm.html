@@ -1,0 +1,154 @@
+{% extends 'asa18/meeting_master.html' %}
+
+{% block headextra %}
+{{ block.super }}
+
+<script>
+   $( document ).ready(function () {
+      $('.dialog-holder').hide();
+      $('.abortable-form input[type=submit][name=_abort]').on('click', function (e) {
+         e.preventDefault();
+         var $this = $(this);
+         $('.dialog-holder').dialog({
+            title: "Please confirm",
+            content: "Are you sure you want to cancel your registration? This will delete all your data from the registration system, and is irreversible.",
+            modal: true,
+            buttons: {
+               "Cancel registration": function () { $this.unbind('click'); $this.trigger('click'); },
+               "No, don't": function () { $( this ).dialog('close'); }
+            },
+         });
+      });
+   });
+</script>
+
+{% endblock %}
+
+{% block content_meeting %}
+
+<h3 class="limit-margin-bottom">Registration for {{ attendee.full_name }}</h3>
+<h1 class="limit-margin-top">Final Step - Confirmation</h1>
+
+<div class="warning">Do NOT use your Back, Forward or Refresh buttons.<br />
+If you need to leave the registration system, please use the 'Cancel' button below
+ - do NOT simply leave the page!</div><br />
+
+{% for message in messages %}
+<div class="{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% if success_message %}<div class="success">{{ success_message }}</div>{% endif %}
+
+<p>Your registration is nearly complete. All you need to do now is check the information listed below, and
+click the confirm button.</p>
+
+<p>Upon clicking {% if total_cost > 0. %}Pay with Card or {% endif %}Confirm, your registration will be locked and
+   {% if total_cost > 0. %} you will shown a <a href="https://stripe.com">Stripe</a> widget to pay for those meetings/events that require
+   it. Note that any zero-cost meetings or events in your registration package will not appear on your tax invoice.
+   If you do not wish to pay immediately, click 'Confirm', and simply close the resulting payment window - you can come
+   back and pay later. Note that you <strong>must</strong> pay for early-bird registrations before their closing date, or your registration
+   option will be changed to its full-price equivalent.
+   {% else %} you will be re-directed to the conference home page. You have no costs to pay.
+   {% endif %} Your tax invoice &amp; full registration overview will be automatically emailed to the email address you provided.</p>
+
+<p>If you encounter any issues during your registration process, please
+    contact <a href="mailto:{{ REGISTRATION_EMAIL }}">{{ REGISTRATION_EMAIL }}</a>.</p>
+
+<div class="half float-left">
+   <h3>Personal information</h3>
+   <p>
+      <strong>{{ attendee.full_name }}</strong><br />
+      {{ attendee.institution }}<br />
+      {{ attendee.get_academic_level_display }}<br />
+      {% if attendee.is_asa_member or attendee.is_nz_astro %}
+         {% if attendee.is_asa_member %}ASA member <br />
+         {% else %}NZ astronomer <br />
+      {% endif %}{% endif %}
+   </p>
+</div>
+
+<div class="half float-left">
+   <h3>Address &amp; contact details</h3>
+   <p>{{ attendee.address_html|safe }}<br />
+   E: {{ attendee.email }}<br />
+      P: {{ attendee.phone }}
+   </p>
+</div>
+
+<h2>Registered meetings &amp; events</h2>
+<p>All prices are in $AUD and include GST. Meetings/events which have already been paid for, or
+bear no cost, are marked with a striped background.</p>
+<table class="stripe-rows" style="width: 100%;">
+   <tr><th colspan="2">Meetings</th></tr>
+   {% for rego in regos_meetings %}
+   <tr><td{% if rego.is_paid or rego.cost == 0 %} class="zebra" {% endif %}><strong>{{ rego.meeting.name }}</strong><br />{{ rego.meeting_rego.name }}
+   {% for p_rego, pres in presentations.items %}{% if p_rego == rego %}
+      <p><strong>Submitted abstracts</strong></p>
+      {% for p in pres %}
+         {{ p.title }} ({{ p.get_type_display }})<br />
+         <span class="hint">{{ p.abstract|safe }}</span>
+         {% if not forloop.last %}<br />{% endif %}
+      {% endfor %}
+   {% endif %}{% endfor %}
+   </td>
+      <td style="text-align: right;"{% if rego.is_paid or rego.cost == 0 %} class="zebra" {% endif %}>{% if rego.is_paid %}PAID{% else %}${{ rego.meeting_rego.cost }}{% endif %}</td>
+   </tr>
+   {% endfor %}
+
+   {% if regos_events.count > 0 %}
+   <tr><th colspan="2">Events</th> </tr>
+   {% for rego in regos_events %}
+   <tr><td{% if rego.is_paid or rego.event_option.cost == 0 %} class="zebra" {% endif %}><strong>{{ rego.event.name }}</strong><br />{{ rego.event_option.name }}
+      {% if rego.dietaryrestriction_set.count > 0 %}<span class="hint"><br />
+         Dietary needs (one line per person): {% for r in rego.dietaryrestriction_set.all %}<br />
+         {% if r.restriction %}{{ r.get_restriction_display }}{% if r.other_restriction %}, {% endif %}{% endif %}
+         {% if r.other_restriction %}{{ r.other_restriction }}{% endif %}{% endfor %}{% endif %}
+      </span></td>
+   <td style="text-align: right;"{% if rego.is_paid or rego.event_option.cost == 0 %} class="zebra" {% endif %}>{% if rego.is_paid %}PAID{% else %}${{ rego.event_option.cost }}{% endif %}</td></tr>
+   {% endfor %}
+   {% endif %}
+
+   <tr><th style="text-align: left">TOTAL COST</th>
+   <th style="text-align: right">${{ total_cost }}</th></tr>
+</table><br />
+
+<form method="post" action="{% url 'register_confirm' %}" style="width: 100%; text-align: center;" class="abortable-form">
+   {% csrf_token %}
+   {% if total_cost > 0. %}All your information correct? If so, you can<br />
+   <script
+    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+    data-key="{{ stripe_key_public }}"
+    data-amount="{{ total_cost_cents }}"
+    data-currency="aud"
+    data-name="Stripe.com"
+    data-description="Widget"
+    data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+    data-locale="auto"
+    data-allow-remember-me="false"
+    data-zip-code="true">
+   </script><br />via our <a href="https://stripe.com" target="_blank">Stripe</a> interface.</form>
+   <form method="post" action="{% url 'register_confirm' %}" style="width: 100%; text-align: center;" class="abortable-form">
+      {% csrf_token %}
+   <p>Alternatively, you can confirm your registration, but pay later, by clicking here:<br /><input type="submit" name="_confirm" value="Confirm" /></p>
+   {% else %}
+   All your information correct? If so, you can confirm your registration:<br /><input type="submit" name="_confirm" value="Confirm" />
+   {% endif %}
+   <p>If something is incorrect, you will need to use the buttons below to step back to the
+   <strong>earliest</strong> point where you made an error. Note that this will require
+   you to re-do <strong>all</strong> subsequent registration steps (although your browser may remember
+      your prior input).
+{#       However, do <strong>not</strong> use these buttons if your only error(s) are#}
+{#   in your abstracts; we will provide a service for adding/changing/withdrawing these at a later date.#}
+   </p>
+   <p style="line-height: 200%;">Edit my:<br />
+   <input type="submit" name="_personal" value="Personal details" style="margin: 5px;"/><br />
+   <input type="submit" name="_meeting" value="Meetings" style="margin: 5px;" /><br />
+      <input type="submit" name="_event" value="Events" style="margin: 5px;" /></p><br /><br />
+   <input type="submit" name="_abort"
+          value="Cancel registration" style="background-color: red;" />
+</form>
+
+<div class="dialog-holder" title="Are you sure?" style="display: none;">
+   <p>Are you sure you want to cancel your registration? This will delete all your data from the registration system, and is irreversible.</p>
+</div>
+
+{% endblock %}

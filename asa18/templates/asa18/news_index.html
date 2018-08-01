@@ -1,0 +1,20 @@
+{% extends 'asa18/meeting_master.html' %}
+{% load staticfiles %}
+{% load asa18_extras %}
+
+{% block content_meeting %}
+
+<h1>{% if meeting %}{{ meeting.name }} &ndash; {% endif %}News</h1>
+
+{% if news_items.count == 0 %}
+<p>There are no news items listed{% if meeting %} for {{ meeting.abbrv }}{% endif %}.</p>
+{% endif %}
+
+{% for news in news_items %}
+<h2>{{ news.title }} <span class="hint">| {{ news.pub_date }}</span></h2>
+{{ news.body|safe|truncatewords_html:25 }}
+<a href="{% if meeting %}{{ news|get_meeting_url:meeting.slug }}{% else %}{{ news.get_absolute_url }}{% endif %}">Read more &rarr;</a>
+{% if not forloop.last %}<hr class="rulemain" style="margin-top:1.66em;"/>{% endif %}
+{% endfor %}
+
+{% endblock %}
